@@ -15,7 +15,15 @@ export default function Home() {
           query: { n: 1 },
         }}
       >
-        <a>Go</a>
+        <a>Act 1</a>
+      </Link>
+      <Link
+        href={{
+          pathname: "/act",
+          query: { n: 2 },
+        }}
+      >
+        <a>Act 2</a>
       </Link>
     </div>
   );

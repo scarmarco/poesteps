@@ -1,14 +1,23 @@
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { google } from "googleapis";
 
 import React from "react";
 
-const Act = ({ data, id }) => {
-  const [header, ...steps] = data;
+const Act = ({ data }) => {
+  const router = useRouter();
+  const {
+    query: { n = 1 },
+  } = router;
+
+  const act = n - 1;
+  const actData = data[act].values.flat();
+  const [header, ...steps] = actData;
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-800">
       <Head>
-        <title>Leveling | Act {id}</title>
+        <title>Leveling | Act {act}</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
@@ -17,8 +26,10 @@ const Act = ({ data, id }) => {
       </header>
 
       <div className="px-8 py-4 text-gray-300">
-        {steps.map((text) => (
-          <p className="py-1">{text}</p>
+        {steps.map((text, i) => (
+          <p key={i} className="py-1">
+            {text}
+          </p>
         ))}
       </div>
     </div>
@@ -27,18 +38,9 @@ const Act = ({ data, id }) => {
 
 export default Act;
 
-export async function getStaticPaths() {
-  const paths = Array.from({ length: 10 }, (_, i) => ({
-    params: { id: `${i + 1}` },
-  }));
+export async function getStaticProps() {
+  const ranges = Array.from({ length: 10 }, (_, i) => `Act ${i + 1}`);
 
-  return {
-    paths,
-    fallback: false,
-  };
-}
-
-export async function getStaticProps({ params }) {
   try {
     const target = ["https://www.googleapis.com/auth/spreadsheets.readonly"];
     const jwt = new google.auth.JWT(
@@ -50,19 +52,15 @@ export async function getStaticProps({ params }) {
 
     const sheets = google.sheets({ version: "v4", auth: jwt });
 
-    const range = `Act ${params.id}`;
-
     const {
-      data: { values },
-    } = await sheets.spreadsheets.values.get({
+      data: { valueRanges },
+    } = await sheets.spreadsheets.values.batchGet({
       spreadsheetId: process.env.SPREADSHEET_ID,
-      range,
+      ranges,
     });
 
-    const data = values.flat();
-
     return {
-      props: { data, id: params.id },
+      props: { data: valueRanges },
     };
   } catch (error) {
     console.log(error);

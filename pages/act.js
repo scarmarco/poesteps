@@ -1,8 +1,9 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { google } from "googleapis";
 
-import React from "react";
+import { acts } from "../constants";
 
 const Act = ({ data }) => {
   const router = useRouter();
@@ -21,9 +22,26 @@ const Act = ({ data }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <header className="px-6 py-2 text-gray-100 text-lg bg-gray-900 shadow-sm">
+      <nav className="flex px-6 py-2 text-lg bg-gray-900 shadow-sm text-gray-300 mb-6">
+        <h1 className="flex-1 font-semibold">Path of Exile Leveling Guide</h1>
+        <div className="flex justify-between flex-1 ml-4">
+          {acts.map((act) => (
+            <Link
+              key={act}
+              href={{
+                pathname: "/act",
+                query: { n: act },
+              }}
+            >
+              <a>Act {act}</a>
+            </Link>
+          ))}
+        </div>
+      </nav>
+
+      <div className="px-6 text-gray-100 font-semibold">
         Leveling guide for {header}
-      </header>
+      </div>
 
       <div className="px-8 py-4 text-gray-300">
         {steps.map((text, i) => (

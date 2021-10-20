@@ -63,6 +63,7 @@ export async function getStaticProps() {
 
     return {
       props: { data: valueRanges },
+      revalidate: 120,
     };
   } catch (error) {
     console.log(error);
